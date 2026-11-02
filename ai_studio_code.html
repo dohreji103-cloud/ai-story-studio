@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA // AI Story & Film Production Studio</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            cinzel: ['Cinzel', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            obsidian: '#07050A',
+            surface: '#120B1D',
+            surfaceLight: '#1C122C',
+            accentPurple: '#A855F7',
+            accentVivid: '#9333EA',
+            neonCyan: '#22D3EE',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07050a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #3b1d60;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9333ea;
+    }
+    
+    .glow-purple {
+      box-shadow: 0 0 35px -5px rgba(168, 85, 247, 0.35);
+    }
+    .glow-border {
+      box-shadow: inset 0 0 15px rgba(168, 85, 247, 0.2);
+    }
+    .film-strip {
+      background-image: radial-gradient(#120b1d 20%, transparent 20%), radial-gradient(#120b1d 20%, transparent 20%);
+      background-color: #07050a;
+      background-position: 0 0, 10px 10px;
+      background-size: 20px 20px;
+    }
+  </style>
+</head>
+<body class="bg-obsidian text-slate-200 font-sans min-h-screen flex flex-col selection:bg-purple-600 selection:text-white">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="border-b border-purple-950/60 bg-obsidian/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3.5 transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-900 via-accentVivid to-neonCyan flex items-center justify-center p-[1px] shadow-lg shadow-purple-900/40">
+          <div class="w-full h-full bg-obsidian rounded-[11px] flex items-center justify-center">
+            <i data-lucide="sparkles" class="w-5 h-5 text-accentPurple"></i>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-cinzel text-lg tracking-widest font-black text-white">AURA</h1>
+            <span class="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-800/40">Studio v2.4</span>
+          </div>
+          <p class="text-[11px] text-purple-300/60 font-sans tracking-wide">Next-Gen Cinematic & Narrative Engine</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Pill -->
+      <div class="flex bg-surface border border-purple-900/50 p-1 rounded-xl">
+        <button id="modeStoryBtn" onclick="switchMode('story')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-purple-700 to-accentVivid text-white shadow-md">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+          <span>STORY MODE</span>
+        </button>
+        <button id="modeFilmBtn" onclick="switchMode('film')" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-white">
+          <i data-lucide="clapperboard" class="w-3.5 h-3.5"></i>
+          <span>FILM MODE</span>
+        </button>
+      </div>
+
+      <!-- Tools & Ambiance Controls -->
+      <div class="flex items-center space-x-3">
+        <!-- Ambient Sound Player -->
+        <button id="ambianceToggle" onclick="toggleAmbiance()" class="hidden md:flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-surfaceLight/60 border border-purple-900/40 text-xs text-purple-300 hover:border-purple-600 transition-all">
+          <i id="ambianceIcon" data-lucide="volume-x" class="w-3.5 h-3.5"></i>
+          <span id="ambianceLabel">Ambiance Drone</span>
+        </button>
+        <button onclick="loadPresetPrompt()" class="text-xs bg-purple-950/40 hover:bg-purple-900/50 border border-purple-800/30 text-purple-200 px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1.5">
+          <i data-lucide="wand-2" class="w-3.5 h-3.5 text-neonCyan"></i>
+          <span class="hidden sm:inline">Try Preset</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN STUDIO WORKSPACE -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 lg:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <!-- LEFT PANEL: STUDIO CONTROLS (5 Cols) -->
+    <div class="lg:col-span-5 space-y-5">
+      
+      <!-- Studio Control Card -->
+      <div class="bg-surface border border-purple-900/40 rounded-2xl p-5 shadow-2xl relative overflow-hidden glow-border">
+        <div class="absolute -top-24 -right-24 w-48 h-48 bg-purple-700/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Mode Indicator Subheading -->
+        <div class="flex items-center justify-between pb-4 border-b border-purple-950/80 mb-4">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-accentPurple animate-ping"></span>
+            <h2 id="controlPanelTitle" class="text-xs font-mono font-bold tracking-widest uppercase text-purple-300">
+              Narrative Parameters
+            </h2>
+          </div>
+          <span id="badgeCurrentMode" class="text-[11px] font-mono text-neonCyan bg-cyan-950/30 border border-cyan-800/40 px-2 py-0.5 rounded">
+            LITERARY FICTION
+          </span>
+        </div>
+
+        <!-- FORM: Shared & Dynamic Fields -->
+        <form id="studioForm" onsubmit="event.preventDefault(); generateOutput();" class="space-y-4">
+          
+          <!-- Core Concept / Premise -->
+          <div>
+            <label class="block text-xs font-medium text-slate-300 mb-1.5 flex items-center justify-between">
+              <span>Premise or Core Idea</span>
+              <span class="text-[10px] text-purple-400 font-mono">Required</span>
+            </label>
+            <textarea id="inputConcept" rows="3" required
+              placeholder="e.g., A memory archivist discovers a classified timeline where humanity never developed digital computing..."
+              class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-accentPurple transition-all resize-none"></textarea>
+          </div>
+
+          <!-- Genre & Language -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Genre</label>
+              <select id="inputGenre" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                <option value="Cyberpunk Noir">Cyberpunk Noir</option>
+                <option value="Cosmic / Psychological Horror">Cosmic Horror</option>
+                <option value="Dark Fantasy Epic">Dark Fantasy Epic</option>
+                <option value="Hard Sci-Fi Mystery">Hard Sci-Fi</option>
+                <option value="Dystopian Thriller">Dystopian Thriller</option>
+                <option value="Neo-Tokyo Melodrama">Neo-Tokyo Melodrama</option>
+                <option value="Ancient Historical Mystery">Historical Mystery</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Language</label>
+              <select id="inputLanguage" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                <option value="English">English</option>
+                <option value="Spanish (Español)">Spanish</option>
+                <option value="French (Français)">French</option>
+                <option value="Japanese (日本語)">Japanese</option>
+                <option value="German (Deutsch)">German</option>
+                <option value="Hindi (हिंदी)">Hindi</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- DYNAMIC STORY MODE FIELDS -->
+          <div id="storySpecificControls" class="space-y-4">
+            <!-- Setting & Ending -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Setting Environment</label>
+                <input type="text" id="inputSetting" placeholder="Submerged Neo-Venice, 2184" value="Subterranean Rain-Slick Metropolis"
+                  class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Story Ending Tone</label>
+                <select id="inputEnding" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                  <option value="Twist Revelation">Mind-Bending Twist</option>
+                  <option value="Poetic Ambiguity">Poetic Ambiguity</option>
+                  <option value="Tragic Catastrophe">Tragic Catharsis</option>
+                  <option value="Triumphant Ascent">Triumphant Victory</option>
+                  <option value="Cliffhanger">High-Stakes Cliffhanger</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Length & Pace -->
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Story Length</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button type="button" onclick="selectLength('Flash Fiction (~350 words)', this)" class="length-chip px-2.5 py-1.5 text-[11px] rounded-lg border border-purple-900 bg-obsidian text-purple-200 hover:border-purple-600 transition-all active-chip font-medium">Flash</button>
+                <button type="button" onclick="selectLength('Short Story (~800 words)', this)" class="length-chip px-2.5 py-1.5 text-[11px] rounded-lg border border-purple-900 bg-obsidian text-purple-200 hover:border-purple-600 transition-all font-medium">Standard</button>
+                <button type="button" onclick="selectLength('Extended Chapter (~1,500 words)', this)" class="length-chip px-2.5 py-1.5 text-[11px] rounded-lg border border-purple-900 bg-obsidian text-purple-200 hover:border-purple-600 transition-all font-medium">Novella Ch.1</button>
+              </div>
+            </div>
+
+            <!-- Dynamic Character Builder -->
+            <div class="bg-obsidian/60 border border-purple-950/70 rounded-xl p-3 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-purple-300 flex items-center space-x-1.5">
+                  <i data-lucide="users" class="w-3.5 h-3.5 text-accentPurple"></i>
+                  <span>Dramatis Personae</span>
+                </span>
+                <button type="button" onclick="addCharacterField()" class="text-[11px] text-neonCyan hover:underline flex items-center space-x-1">
+                  <i data-lucide="plus" class="w-3 h-3"></i>
+                  <span>Add Character</span>
+                </button>
+              </div>
+              <div id="characterList" class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                <!-- Preset Character 1 -->
+                <div class="flex items-center space-x-2 text-xs bg-surfaceLight/80 p-2 rounded-lg border border-purple-900/30">
+                  <input type="text" value="Dr. Silas Vance" placeholder="Name" class="w-1/3 bg-transparent text-white border-b border-purple-900/60 pb-0.5 focus:outline-none focus:border-accentPurple">
+                  <input type="text" value="Obsessive Synaptic Historian, haunted by grief" placeholder="Personality & Motivation" class="w-2/3 bg-transparent text-purple-200 text-[11px] border-b border-purple-900/60 pb-0.5 focus:outline-none">
+                </div>
+                <!-- Preset Character 2 -->
+                <div class="flex items-center space-x-2 text-xs bg-surfaceLight/80 p-2 rounded-lg border border-purple-900/30">
+                  <input type="text" value="Echo-7" placeholder="Name" class="w-1/3 bg-transparent text-white border-b border-purple-900/60 pb-0.5 focus:outline-none focus:border-accentPurple">
+                  <input type="text" value="Rogue synthetic courier seeking self-determination" placeholder="Personality & Motivation" class="w-2/3 bg-transparent text-purple-200 text-[11px] border-b border-purple-900/60 pb-0.5 focus:outline-none">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DYNAMIC FILM MODE FIELDS -->
+          <div id="filmSpecificControls" class="space-y-4 hidden">
+            <!-- Director Vision & Cinematic Lens -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Director Influence</label>
+                <select id="filmDirector" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                  <option value="Denis Villeneuve (Atmospheric, Brutalist, Scale)">Denis Villeneuve</option>
+                  <option value="Christopher Nolan (Non-linear, High Tempo, Practical)">Christopher Nolan</option>
+                  <option value="Wong Kar-wai (Step-printed, Neon, Melancholic)">Wong Kar-wai</option>
+                  <option value="David Fincher (Precise, Low-Key Chiaroscuro)">David Fincher</option>
+                  <option value="Guillermo del Toro (Gothic, Ornate, Shadow-play)">Guillermo del Toro</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Optics & Aspect Ratio</label>
+                <select id="filmCamera" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                  <option value="35mm Anamorphic • 2.39:1 CinemaScope">35mm Anamorphic (2.39:1)</option>
+                  <option value="IMAX 70mm • 1.43:1 High Immersion">IMAX 70mm (1.43:1)</option>
+                  <option value="Vintage Cooke S4 Prime • 1.85:1">Vintage Cooke 50mm Prime</option>
+                  <option value="Handheld 16mm Grain • Gritty Docu">Gritty 16mm Handheld</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Lighting & Color Grading -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Lighting Setup</label>
+                <select id="filmLighting" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                  <option value="Volumetric Neon Haze & Deep Silhouette">Volumetric Neon & Rim Light</option>
+                  <option value="Harsh High-Contrast Chiaroscuro Noir">Harsh Chiaroscuro</option>
+                  <option value="Cold Diffused Overcast Arctic Light">Diffused Arctic Frost</option>
+                  <option value="Sodium-Vapor Warm Amber & Charcoal">Sodium Vapor & Deep Shadows</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-300 mb-1.5">Prompt Target Platform</label>
+                <select id="filmEngine" class="w-full bg-obsidian/80 border border-purple-950 focus:border-accentPurple rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none">
+                  <option value="Midjourney v6.1 & Sora Ultra">Midjourney v6 + OpenAI Sora</option>
+                  <option value="Runway Gen-3 Alpha & Flux Pro">Runway Gen-3 + Flux Pro</option>
+                  <option value="Kling AI & Stable Video XL">Kling AI + Luma Dream Machine</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Number of Scenes to Render -->
+            <div>
+              <div class="flex justify-between text-xs text-slate-300 mb-1">
+                <span>Production Breakdown Scale</span>
+                <span id="sceneCountLabel" class="text-neonCyan font-mono">3 Full Sequences (9 Shots)</span>
+              </div>
+              <input type="range" id="sceneRange" min="2" max="5" value="3" oninput="updateSceneLabel(this.value)"
+                class="w-full accent-purple-500 bg-obsidian h-1.5 rounded-lg appearance-none cursor-pointer">
+            </div>
+          </div>
+
+          <!-- GENERATE ACTION BUTTON -->
+          <div class="pt-3">
+            <button type="submit" id="generateBtn"
+              class="w-full relative group overflow-hidden rounded-xl p-[1px] font-semibold text-white transition-all transform active:scale-[0.99] glow-purple">
+              <span class="absolute inset-0 bg-gradient-to-r from-purple-600 via-accentVivid to-neonCyan rounded-xl transition-all duration-300"></span>
+              <div class="relative bg-obsidian px-5 py-3.5 rounded-[11px] flex items-center justify-center space-x-2 transition-all duration-200 group-hover:bg-opacity-0">
+                <i data-lucide="sparkle" class="w-4 h-4 text-accentPurple group-hover:text-white transition-transform group-hover:rotate-180"></i>
+                <span id="generateBtnText" class="tracking-wider uppercase text-xs font-bold font-cinzel">Construct Storyboard & Narrative</span>
+              </div>
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Quick Feature Badge Tray -->
+      <div class="grid grid-cols-3 gap-2 text-center text-[11px] text-purple-300/80">
+        <div class="bg-surface/60 border border-purple-950/60 p-2.5 rounded-xl">
+          <i data-lucide="film" class="w-3.5 h-3.5 mx-auto text-accentPurple mb-1"></i>
+          <span>Cinematic Prompts</span>
+        </div>
+        <div class="bg-surface/60 border border-purple-950/60 p-2.5 rounded-xl">
+          <i data-lucide="message-square" class="w-3.5 h-3.5 mx-auto text-neonCyan mb-1"></i>
+          <span>Natural Dialogue</span>
+        </div>
+        <div class="bg-surface/60 border border-purple-950/60 p-2.5 rounded-xl">
+          <i data-lucide="headphones" class="w-3.5 h-3.5 mx-auto text-purple-400 mb-1"></i>
+          <span>Score & Foley Cues</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL: INTERACTIVE CANVAS & OUTPUT (7 Cols) -->
+    <div class="lg:col-span-7 flex flex-col space-y-4">
+
+      <!-- Output Mode Header & Tabs -->
+      <div class="bg-surface border border-purple-900/50 rounded-2xl p-2 flex flex-wrap items-center justify-between gap-2 shadow-xl">
+        <div class="flex items-center space-x-1" id="outputTabsContainer">
+          <!-- Dynamically populated based on mode -->
+        </div>
+
+        <!-- Global Output Utility Actions -->
+        <div class="flex items-center space-x-1.5 px-2">
+          <button onclick="readAloudOutput()" id="speechBtn" title="Listen to Narration" class="p-2 rounded-lg bg-surfaceLight hover:bg-purple-950 text-slate-300 hover:text-white border border-purple-900/40 transition-colors">
+            <i data-lucide="volume-2" class="w-4 h-4 text-neonCyan"></i>
+          </button>
+          <button onclick="copyCurrentTab()" title="Copy to Clipboard" class="p-2 rounded-lg bg-surfaceLight hover:bg-purple-950 text-slate-300 hover:text-white border border-purple-900/40 transition-colors">
+            <i data-lucide="copy" class="w-4 h-4 text-purple-300"></i>
+          </button>
+          <button onclick="exportDocument()" title="Export Markdown / TXT" class="p-2 rounded-lg bg-surfaceLight hover:bg-purple-950 text-slate-300 hover:text-white border border-purple-900/40 transition-colors">
+            <i data-lucide="download" class="w-4 h-4 text-slate-200"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- MAIN RESULT DISPLAY VIEWPORT -->
+      <div class="flex-1 bg-surface/90 border border-purple-900/40 rounded-2xl p-6 overflow-y-auto min-h-[580px] max-h-[780px] shadow-2xl relative glow-border flex flex-col">
+        
+        <!-- EMPTY / IDLE STATE -->
+        <div id="idleState" class="m-auto text-center py-12 max-w-md">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-surfaceLight border border-purple-800/40 flex items-center justify-center text-accentPurple shadow-lg">
+            <i data-lucide="clapperboard" class="w-8 h-8 opacity-80"></i>
+          </div>
+          <h3 class="font-cinzel text-base tracking-widest text-white mb-2">STUDIO READY FOR PRODUCTION</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-6">
+            Configure your parameters on the left or click below to synthesize a complete high-fidelity narrative experience.
+          </p>
+          <button onclick="loadPresetPrompt(); generateOutput();" class="inline-flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-purple-950 hover:bg-purple-900/60 border border-purple-700/50 text-purple-200 text-xs font-semibold tracking-wide transition-all">
+            <i data-lucide="play" class="w-3.5 h-3.5 text-neonCyan"></i>
+            <span>Load & Synthesize Demo Project</span>
+          </button>
+        </div>
+
+        <!-- GENERATING PROGRESS STATE -->
+        <div id="loadingState" class="m-auto text-center py-16 hidden">
+          <div class="relative w-20 h-20 mx-auto mb-6">
+            <div class="absolute inset-0 rounded-full border-2 border-purple-950 border-t-accentPurple animate-spin"></div>
+            <div class="absolute inset-2 rounded-full border-2 border-purple-950 border-b-neonCyan animate-spin" style="animation-direction: reverse; animation-duration: 2s;"></div>
+            <i data-lucide="sparkles" class="w-6 h-6 text-purple-300 absolute inset-0 m-auto animate-pulse"></i>
+          </div>
+          <h4 id="loadingStep" class="font-mono text-xs text-neonCyan tracking-wider uppercase mb-1">Architecting Narrative Tension...</h4>
+          <p class="text-[11px] text-purple-300/60 font-mono">Calibrating lenses, lighting keys & dramatic subtext</p>
+        </div>
+
+        <!-- RENDERED CONTENT VIEWS -->
+        <div id="renderedOutput" class="hidden space-y-6">
+          <!-- Dynamic Content Injected Here -->
+        </div>
+
+      </div>
+
+      <!-- Live Production Status Footnote -->
+      <div class="flex items-center justify-between text-[11px] font-mono text-purple-400/60 px-2">
+        <div class="flex items-center space-x-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+          <span>GPU Synthesizer Active</span>
+        </div>
+        <span id="latencyStamp">Ready</span>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- JAVASCRIPT LOGIC ENGINE -->
+  <script>
+    // Global Studio State
+    const state = {
+      mode: 'story', // 'story' | 'film'
+      currentTab: 'primary',
+      selectedLength: 'Flash Fiction (~350 words)',
+      isAmbiancePlaying: false,
+      audioCtx: null,
+      oscillatorNode: null,
+      gainNode: null,
+      generatedData: null
+    };
+
+    // Initialize Lucide Icons on load
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      updateOutputTabs();
+    });
+
+    // Switch Studio Mode
+    function switchMode(newMode) {
+      state.mode = newMode;
+      const storyBtn = document.getElementById('modeStoryBtn');
+      const filmBtn = document.getElementById('modeFilmBtn');
+      const storySpecific = document.getElementById('storySpecificControls');
+      const filmSpecific = document.getElementById('filmSpecificControls');
+      const panelTitle = document.getElementById('controlPanelTitle');
+      const badgeMode = document.getElementById('badgeCurrentMode');
+      const btnText = document.getElementById('generateBtnText');
+
+      if (newMode === 'story') {
+        storyBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-purple-700 to-accentVivid text-white shadow-md";
+        filmBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-white";
+        storySpecific.classList.remove('hidden');
+        filmSpecific.classList.add('hidden');
+        panelTitle.innerText = "NARRATIVE PARAMETERS";
+        badgeMode.innerText = "LITERARY FICTION";
+        badgeMode.className = "text-[11px] font-mono text-neonCyan bg-cyan-950/30 border border-cyan-800/40 px-2 py-0.5 rounded";
+        btnText.innerText = "Generate Complete Story & Cast";
+      } else {
+        filmBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all bg-gradient-to-r from-purple-700 to-accentVivid text-white shadow-md";
+        storyBtn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all text-slate-400 hover:text-white";
+        storySpecific.classList.add('hidden');
+        filmSpecific.classList.remove('hidden');
+        panelTitle.innerText = "DIRECTOR SPECIFICATIONS";
+        badgeMode.innerText = "CINEMA PRODUCTION";
+        badgeMode.className = "text-[11px] font-mono text-accentPurple bg-purple-950/40 border border-purple-800/40 px-2 py-0.5 rounded";
+        btnText.innerText = "Compile Director Shot Board & Prompts";
+      }
+
+      updateOutputTabs();
+      lucide.createIcons();
+    }
+
+    // Update scene range label
+    function updateSceneLabel(val) {
+      document.getElementById('sceneCountLabel').innerText = `${val} Sequences (${val * 3} Detailed Shots)`;
+    }
+
+    // Story Length Button Selector
+    function selectLength(len, btn) {
+      state.selectedLength = len;
+      document.querySelectorAll('.length-chip').forEach(b => {
+        b.classList.remove('border-accentPurple', 'text-white', 'bg-purple-900/40');
+      });
+      btn.classList.add('border-accentPurple', 'text-white', 'bg-purple-900/40');
+    }
+
+    // Add dynamic character entry
+    function addCharacterField() {
+      const list = document.getElementById('characterList');
+      const div = document.createElement('div');
+      div.className = "flex items-center space-x-2 text-xs bg-surfaceLight/80 p-2 rounded-lg border border-purple-900/30 animate-fadeIn";
+      div.innerHTML = `
+        <input type="text" placeholder="Character Name" class="w-1/3 bg-transparent text-white border-b border-purple-900/60 pb-0.5 focus:outline-none focus:border-accentPurple">
+        <input type="text" placeholder="Archetype, Motive & Fatal Flaw" class="w-2/3 bg-transparent text-purple-200 text-[11px] border-b border-purple-900/60 pb-0.5 focus:outline-none">
+        <button type="button" onclick="this.parentElement.remove()" class="text-rose-400 hover:text-rose-300 p-1">
+          <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+        </button>
+      `;
+      list.appendChild(div);
+      lucide.createIcons();
+    }
+
+    // Load Quick Preset Data
+    function loadPresetPrompt() {
+      const presets = [
+        {
+          concept: "In an atmospheric neo-Kyoto flooded by perma-rain, a retired cyber-memory detective is hired by a girl who remembers dying three centuries ago.",
+          genre: "Cyberpunk Noir",
+          setting: "Drowned District 9, neon lantern shadows under perpetual acid rain",
+          director: "Denis Villeneuve (Atmospheric, Brutalist, Scale)",
+          camera: "35mm Anamorphic • 2.39:1 CinemaScope"
+        },
+        {
+          concept: "Deep-space research vessel Horizon-Null encounters an anomalous mirror singularity where transmissions from the future predict the crew's immediate mutiny.",
+          genre: "Cosmic / Psychological Horror",
+          setting: "Derelict observation deck in orbit of black hole Tartarus-X",
+          director: "Christopher Nolan (Non-linear, High Tempo, Practical)",
+          camera: "IMAX 70mm • 1.43:1 High Immersion"
+        }
+      ];
+
+      const item = presets[Math.floor(Math.random() * presets.length)];
+      document.getElementById('inputConcept').value = item.concept;
+      document.getElementById('inputGenre').value = item.genre;
+      if (document.getElementById('inputSetting')) {
+        document.getElementById('inputSetting').value = item.setting;
+      }
+      if (document.getElementById('filmDirector')) {
+        document.getElementById('filmDirector').value = item.director;
+      }
+      if (document.getElementById('filmCamera')) {
+        document.getElementById('filmCamera').value = item.camera;
+      }
+    }
+
+    // Update Output Tabs based on Mode
+    function updateOutputTabs() {
+      const container = document.getElementById('outputTabsContainer');
+      if (state.mode === 'story') {
+        container.innerHTML = `
+          <button onclick="switchTab('primary')" id="tab-primary" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-purple-900/70 border border-purple-700/50 flex items-center space-x-1.5">
+            <i data-lucide="book-open-text" class="w-3.5 h-3.5 text-accentPurple"></i>
+            <span>Complete Story</span>
+          </button>
+          <button onclick="switchTab('characters')" id="tab-characters" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white flex items-center space-x-1.5">
+            <i data-lucide="user-check" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Cast Dossier</span>
+          </button>
+          <button onclick="switchTab('dialogue')" id="tab-dialogue" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white flex items-center space-x-1.5">
+            <i data-lucide="message-circle-code" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Dialogue Script</span>
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="switchTab('primary')" id="tab-primary" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-white bg-purple-900/70 border border-purple-700/50 flex items-center space-x-1.5">
+            <i data-lucide="film" class="w-3.5 h-3.5 text-accentPurple"></i>
+            <span>Shot-by-Shot Board</span>
+          </button>
+          <button onclick="switchTab('prompts')" id="tab-prompts" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white flex items-center space-x-1.5">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5 text-neonCyan"></i>
+            <span>AI Visual Prompts</span>
+          </button>
+          <button onclick="switchTab('audio')" id="tab-audio" class="tab-btn px-3 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white flex items-center space-x-1.5">
+            <i data-lucide="music-2" class="w-3.5 h-3.5 text-slate-400"></i>
+            <span>Sound & Foley Score</span>
+          </button>
+        `;
+      }
+      state.currentTab = 'primary';
+      lucide.createIcons();
+    }
+
+    // Switch Active Result Tab
+    function switchTab(tabKey) {
+      state.currentTab = tabKey;
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-white', 'bg-purple-900/70', 'border', 'border-purple-700/50');
+        btn.classList.add('text-slate-400');
+      });
+      const active = document.getElementById(`tab-${tabKey}`);
+      if (active) {
+        active.classList.add('text-white', 'bg-purple-900/70', 'border', 'border-purple-700/50');
+        active.classList.remove('text-slate-400');
+      }
+      renderCurrentTabContent();
+    }
+
+    // Ambient Web Audio Synthesizer (Dark Sci-Fi / Film Drone)
+    function toggleAmbiance() {
+      const icon = document.getElementById('ambianceIcon');
+      const label = document.getElementById('ambianceLabel');
+      
+      if (!state.isAmbiancePlaying) {
+        try {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          state.audioCtx = new AudioContext();
+          
+          // Create primary drone osc (low frequency sine)
+          state.oscillatorNode = state.audioCtx.createOscillator();
+          state.oscillatorNode.type = 'sawtooth';
+          state.oscillatorNode.frequency.setValueAtTime(55, state.audioCtx.currentTime); // 55Hz (A1)
+
+          // Filter to muffle into cinematic sub-drone
+          const filter = state.audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(140, state.audioCtx.currentTime);
+
+          state.gainNode = state.audioCtx.createGain();
+          state.gainNode.gain.setValueAtTime(0.04, state.audioCtx.currentTime);
+
+          state.oscillatorNode.connect(filter);
+          filter.connect(state.gainNode);
+          state.gainNode.connect(state.audioCtx.destination);
+
+          state.oscillatorNode.start();
+          state.isAmbiancePlaying = true;
+          
+          label.innerText = "Drone Playing";
+          label.classList.add('text-neonCyan');
+          icon.setAttribute('data-lucide', 'volume-2');
+        } catch(e) {
+          console.warn("Web Audio Ambiance blocked or unsupported", e);
+        }
+      } else {
+        if (state.gainNode && state.audioCtx) {
+          state.gainNode.gain.exponentialRampToValueAtTime(0.0001, state.audioCtx.currentTime + 0.5);
+          setTimeout(() => {
+            if (state.oscillatorNode) state.oscillatorNode.stop();
+            if (state.audioCtx) state.audioCtx.close();
+            state.isAmbiancePlaying = false;
+          }, 500);
+        }
+        label.innerText = "Ambiance Drone";
+        label.classList.remove('text-neonCyan');
+        icon.setAttribute('data-lucide', 'volume-x');
+      }
+      lucide.createIcons();
+    }
+
+    // AI ENGINE SIMULATOR (Dynamic Procedural Generation)
+    function generateOutput() {
+      const premise = document.getElementById('inputConcept').value.trim();
+      if (!premise) {
+        alert("Please enter a premise or core story idea first.");
+        return;
+      }
+
+      const idleState = document.getElementById('idleState');
+      const loadingState = document.getElementById('loadingState');
+      const renderedOutput = document.getElementById('renderedOutput');
+      const loadingStep = document.getElementById('loadingStep');
+      const latencyStamp = document.getElementById('latencyStamp');
+
+      idleState.classList.add('hidden');
+      renderedOutput.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+
+      const steps = [
+        "Analyzing thematic motifs & conflict vectors...",
+        "Calibrating character psyches & dialogue cadences...",
+        "Rendering volumetric lighting, lenses & camera blocking...",
+        "Compiling production cues & generative diffusion prompts..."
+      ];
+
+      let stepIdx = 0;
+      const stepInterval = setInterval(() => {
+        stepIdx++;
+        if (stepIdx < steps.length) {
+          loadingStep.innerText = steps[stepIdx];
+        }
+      }, 350);
+
+      const startTime = performance.now();
+
+      // Simulate generation delay
+      setTimeout(() => {
+        clearInterval(stepInterval);
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+        latencyStamp.innerText = `Synthesized in ${elapsed}s • High Fidelity`;
+
+        // Build procedural content based on actual user inputs
+        buildEngineResults();
+
+        loadingState.classList.add('hidden');
+        renderedOutput.classList.remove('hidden');
+        renderCurrentTabContent();
+      }, 1500);
+    }
+
+    // Procedural Generator Core
+    function buildEngineResults() {
+      const premise = document.getElementById('inputConcept').value;
+      const genre = document.getElementById('inputGenre').value;
+      const lang = document.getElementById('inputLanguage').value;
+
+      if (state.mode === 'story') {
+        const setting = document.getElementById('inputSetting').value || "Subterranean Metropolis";
+        const ending = document.getElementById('inputEnding').value;
+        const lengthChoice = state.selectedLength;
+
+        // Extract characters
+        const charElements = document.querySelectorAll('#characterList > div');
+        const characters = [];
+        charElements.forEach(row => {
+          const inputs = row.querySelectorAll('input');
+          if (inputs.length >= 2 && inputs[0].value.trim()) {
+            characters.push({
+              name: inputs[0].value.trim(),
+              trait: inputs[1].value.trim() || "Enigmatic motive"
+            });
+          }
+        });
+        if (characters.length === 0) {
+          characters.push({ name: "Kaelen Voss", trait: "Disillusioned archivist" });
+          characters.push({ name: "Sola", trait: "Synthetic consciousness seeker" });
+        }
+
+        const protagonist = characters[0];
+        const antagonistOrCo = characters[1] || { name: "The Overseer", trait: "Architect of the status quo" };
+
+        // Story Mode Dataset
+        state.generatedData = {
+          title: generateCinematicTitle(premise, genre),
+          genre: genre,
+          language: lang,
+          setting: setting,
+          ending: ending,
+          length: lengthChoice,
+          protagonist: protagonist,
+          antagonist: antagonistOrCo,
+          characters: characters,
+          // Narrative Chapters
+          chapters: [
+            {
+              heading: "ACT I: THE ANOMALY AT THE THRESHOLD",
+              text: `The rain over ${setting} did not fall so much as it drifted in sheets of atomized tungsten and salt. In this perpetual half-light, ${protagonist.name} traced the iridescent edge of the memory-shard. ${premise} It felt less like a relic of human thought and more like an open wound in physics.\n\n"You are staring into a corridor that has already collapsed," ${antagonistOrCo.name} remarked from the gloom. Their silhouette was broken only by the cold amber diode pulsing in their cybernetic collar. "${protagonist.trait}. That was supposed to keep you safe from looking too deep."`
+            },
+            {
+              heading: "ACT II: THE RESONANCE OF BETRAYAL",
+              text: `Every terminal in the vault chimed in dissonance. The language on screen was rendered in ${lang}, yet the underlying logic was predatory. ${protagonist.name} leaned forward, fingers trembling across the cold basalt interface. The data proved what had long been whispered: humanity's collective consensus had been edited centuries ago to prevent the revelation of their true origin.\n\n"If I release this sequence," ${protagonist.name} whispered, "the entire foundation of the city buckles under the weight of what we forgot."\n\n${antagonistOrCo.name} stepped forward, the gleam of a mono-molecular scalpel reflecting the neon grid. "Then we make certain you stay asleep."`
+            },
+            {
+              heading: `ACT III: THE ${ending.toUpperCase()}`,
+              text: `A sudden static burst shattered the glass viewport, venting the chamber into the howling atmospheric storm. Gravity groaned, inverted, and then surrendered. In that final fraction of a second, ${protagonist.name} did not seek survival—they executed the broadcast command.\n\nThe ending delivered on its promise: ${ending}. As the city below flashed with blinding photonic resonance, the truth settled over the populace like silent snowfall. Nothing would ever return to its familiar orbit.`
+            }
+          ],
+          dialogueExtract: [
+            { speaker: protagonist.name, line: "You took thirty years of my recollection and told me it was a system malfunction." },
+            { speaker: antagonistOrCo.name, line: "We took mercy on you, Silas. Sanity is merely the deliberate omission of inconvenient facts." },
+            { speaker: protagonist.name, line: "Then let me go insane with my eyes completely open." },
+            { speaker: antagonistOrCo.name, line: "Careful what you bargain for. When the curtain burns, the stage burns with it." }
+          ]
+        };
+
+      } else {
+        // Film Mode Dataset
+        const director = document.getElementById('filmDirector').value;
+        const camera = document.getElementById('filmCamera').value;
+        const lighting = document.getElementById('filmLighting').value;
+        const engine = document.getElementById('filmEngine').value;
+        const sceneCount = parseInt(document.getElementById('sceneRange').value, 10);
+
+        state.generatedData = {
+          title: generateCinematicTitle(premise, genre),
+          directorStyle: director,
+          cameraGear: camera,
+          lightingScheme: lighting,
+          engine: engine,
+          scenes: Array.from({ length: sceneCount }, (_, idx) => generateFilmScene(idx + 1, premise, genre, camera, lighting, director))
+        };
+      }
+    }
+
+    // Helper: Title Generator
+    function generateCinematicTitle(premise, genre) {
+      const sciWords = ["ECHO CHAMBER", "NEON SINGULARITY", "VOID VELOCITY", "THE SHADOW PROTOCOL", "OBSIDIAN HORIZON", "SYNAPTIC DUST"];
+      const noirWords = ["A TEAR IN THE RAIN", "THE MIDNIGHT PARADOX", "COLD COPIES", "PULSE OF THE DROWNED"];
+      const pool = genre.includes("Sci-Fi") || genre.includes("Cyberpunk") ? sciWords : noirWords;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    // Helper: Film Scene Generator
+    function generateFilmScene(num, premise, genre, camera, lighting, director) {
+      const sceneNames = [
+        "EXT. SECTOR 4 CORROSION BASIN - NIGHT",
+        "INT. MEMORY ARCHIVE VAULT - DAWN",
+        "EXT. ORBITAL SATELLITE GANTRY - ECLIPSE",
+        "INT. DECONTAMINATION CORRIDOR - HIGH NOON",
+        "EXT. RAIN-SLICK ROOFTOP SPARK-TOWER - ZERO HOUR"
+      ];
+
+      return {
+        sceneNumber: num,
+        heading: sceneNames[(num - 1) % sceneNames.length],
+        logline: `Sequence ${num}: Protagonist confronts the spatial anomaly as external security converges.`,
+        shots: [
+          {
+            shotId: `${num}.1`,
+            type: "EXTREME WIDE / ESTABLISHING",
+            lens: camera.split('•')[0].trim(),
+            movement: "Slow mechanical push-in along symmetrical architecture",
+            visual: `Towering brutalist spires drenched in ${lighting.toLowerCase()}. A microscopic human figure stands at the precipice of a bottomless ventilation shaft.`,
+            lighting: lighting,
+            dialogue: "V.O. (PROTAGONIST): 'We always believed the dark was empty. We were cowards.'",
+            audioFoley: "Deep resonant bass drone (38Hz). Heavy hydraulic venting, slow rhythmic droplet impacts on titanium.",
+            aiPrompt: `Cinematic wide shot directed by ${director.split('(')[0].trim()}, ${premise}, ${camera}, volumetric mist, ${lighting}, highly detailed, unreal engine 5 render, cinematic color grading, 8k, --ar 16:9 --style raw`
+          },
+          {
+            shotId: `${num}.2`,
+            type: "CLOSE-UP (DUTCH TILT)",
+            lens: "50mm Prime T1.3 Anamorphic",
+            movement: "Handheld micro-jitters, focus-rack from reflection on wet glass to human pupil",
+            visual: "Dilated eye showing recursive reflection of blue terminal holograms. Sweat mixed with neon rain running down cheek.",
+            lighting: "Split lighting: Cyan key on left cheek, deep obsidian silhouette on right",
+            dialogue: "ANTAGONIST (OFF-SCREEN): 'Do not look into the mirror, child.'",
+            audioFoley: "Subtle tinnitus frequency whine escalating into sudden vacuum silence.",
+            aiPrompt: `Macro close up of cybernetic human eye with neon HUD reflection, 35mm film grain, directed by ${director.split('(')[0].trim()}, anamorphic lens flares, dramatic chiaroscuro, cinematic award winning frame --ar 16:9 --v 6.1`
+          },
+          {
+            shotId: `${num}.3`,
+            type: "TRACKING SHOT (STEADICAM)",
+            lens: "28mm Ultra-Wide Cine Prime",
+            movement: "Lateral tracking alongside fast-walking subject across rain-slick steel walkway",
+            visual: "Steam jets burst from sub-floor grates. Sparks cascade from severed cables overhead as sirens illuminate the perimeter.",
+            lighting: "Strobe red warning lights alternating with sharp amber ambient bounce",
+            dialogue: "PROTAGONIST: 'I'm not running. I'm executing the purge.'",
+            audioFoley: "Heavy combat boots splashing puddles, urgent brass crescendo in the musical score.",
+            aiPrompt: `Tracking shot of a solitary operative running through a dystopian corridor, wet reflections, sparks flying, cinematic masterpiece, hyper-realistic, photorealistic lighting, 70mm Panavision look --ar 16:9`
+          }
+        ]
+      };
+    }
+
+    // Render Current View
+    function renderCurrentTabContent() {
+      const container = document.getElementById('renderedOutput');
+      if (!state.generatedData) return;
+
+      container.innerHTML = "";
+
+      if (state.mode === 'story') {
+        renderStoryModeView(container);
+      } else {
+        renderFilmModeView(container);
+      }
+
+      lucide.createIcons();
+    }
+
+    // Render: Story Mode Contents
+    function renderStoryModeView(container) {
+      const d = state.generatedData;
+
+      if (state.currentTab === 'primary') {
+        // Complete Story Narrative
+        const storyWrapper = document.createElement('article');
+        storyWrapper.className = "space-y-6 animate-fadeIn";
+
+        storyWrapper.innerHTML = `
+          <!-- Story Header -->
+          <div class="border-b border-purple-950 pb-5">
+            <div class="flex items-center space-x-2 text-[11px] font-mono text-neonCyan uppercase tracking-widest mb-1.5">
+              <span>${d.genre}</span>
+              <span>•</span>
+              <span>${d.language}</span>
+              <span>•</span>
+              <span>${d.length}</span>
+            </div>
+            <h2 class="font-cinzel text-2xl lg:text-3xl font-black text-white tracking-wider">${d.title}</h2>
+            <p class="text-xs text-purple-300/80 mt-1 italic">Setting: ${d.setting} | Culmination: ${d.ending}</p>
+          </div>
+
+          <!-- Story Text Content -->
+          <div class="space-y-6 text-slate-300 text-sm leading-relaxed font-sans">
+            ${d.chapters.map(ch => `
+              <div class="space-y-2.5">
+                <h4 class="font-mono text-xs text-accentPurple font-semibold tracking-wider">${ch.heading}</h4>
+                <p class="whitespace-pre-line text-slate-300/90 leading-7 font-light">${ch.text}</p>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(storyWrapper);
+
+      } else if (state.currentTab === 'characters') {
+        // Cast Dossier Tab
+        const castWrapper = document.createElement('div');
+        castWrapper.className = "space-y-4 animate-fadeIn";
+        castWrapper.innerHTML = `
+          <div class="border-b border-purple-950 pb-3">
+            <h3 class="font-cinzel text-lg text-white font-bold tracking-wide">CAST DOSSIER & PSYCHOLOGICAL PROFILES</h3>
+            <p class="text-xs text-purple-300/60 font-mono">Dramatis Personae synthesized for narrative friction</p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${d.characters.map((c, i) => `
+              <div class="bg-obsidian/70 border border-purple-900/40 rounded-xl p-4 space-y-2.5 hover:border-accentPurple/50 transition-colors">
+                <div class="flex items-center space-x-3">
+                  <div class="w-10 h-10 rounded-full bg-purple-950 border border-purple-700/60 flex items-center justify-center font-cinzel text-accentPurple font-bold text-sm">
+                    ${c.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-bold text-white">${c.name}</h4>
+                    <span class="text-[10px] font-mono text-neonCyan uppercase">${i === 0 ? 'Protagonist / Perspective' : 'Antagonist / Foil'}</span>
+                  </div>
+                </div>
+                <div class="text-xs text-slate-300">
+                  <span class="text-purple-400 font-medium">Core Drive:</span> ${c.trait}
+                </div>
+                <div class="pt-2 border-t border-purple-950/60 flex justify-between text-[11px] font-mono text-slate-500">
+                  <span>Psych State: Volatile</span>
+                  <span>Arc: Transformative</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(castWrapper);
+
+      } else if (state.currentTab === 'dialogue') {
+        // Formatted Dialogue Script Tab
+        const scriptWrapper = document.createElement('div');
+        scriptWrapper.className = "space-y-4 animate-fadeIn font-mono text-xs";
+        scriptWrapper.innerHTML = `
+          <div class="border-b border-purple-950 pb-3 font-sans">
+            <h3 class="font-cinzel text-lg text-white font-bold tracking-wide">KEY DIALOGUE EXCHANGES</h3>
+            <p class="text-xs text-purple-300/60 font-mono">Screenplay format subtext & confrontation lines</p>
+          </div>
+          <div class="bg-obsidian/90 p-5 rounded-xl border border-purple-950 space-y-4">
+            ${d.dialogueExtract.map(dl => `
+              <div class="space-y-1 max-w-lg mx-auto text-left">
+                <div class="text-center font-bold text-accentPurple tracking-widest text-[11px]">${dl.speaker.toUpperCase()}</div>
+                <div class="text-slate-200 text-center font-sans text-xs italic px-6 leading-relaxed">
+                  "${dl.line}"
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(scriptWrapper);
+      }
+    }
+
+    // Render: Film Mode Contents
+    function renderFilmModeView(container) {
+      const d = state.generatedData;
+
+      if (state.currentTab === 'primary') {
+        // Shot-by-Shot Director Board
+        const filmWrapper = document.createElement('div');
+        filmWrapper.className = "space-y-6 animate-fadeIn";
+
+        filmWrapper.innerHTML = `
+          <!-- Production Header -->
+          <div class="border-b border-purple-950 pb-4">
+            <div class="flex items-center space-x-2 text-[11px] font-mono text-neonCyan uppercase tracking-wider mb-1">
+              <span>Director Style: ${d.directorStyle.split('(')[0]}</span>
+              <span>•</span>
+              <span>${d.cameraGear}</span>
+            </div>
+            <h2 class="font-cinzel text-2xl font-black text-white tracking-widest">${d.title}</h2>
+            <div class="text-xs text-purple-300/70 mt-1 flex flex-wrap gap-4">
+              <span><strong>Lighting:</strong> ${d.lightingScheme}</span>
+              <span><strong>Platform:</strong> ${d.engine}</span>
+            </div>
+          </div>
+
+          <!-- Scenes and Shots -->
+          <div class="space-y-6">
+            ${d.scenes.map(sc => `
+              <div class="bg-obsidian/90 border border-purple-950 rounded-xl overflow-hidden shadow-lg">
+                <div class="bg-surfaceLight/80 px-4 py-2.5 border-b border-purple-900/40 flex items-center justify-between">
+                  <span class="font-mono text-xs font-bold text-accentPurple tracking-wider">${sc.heading}</span>
+                  <span class="text-[10px] font-mono text-slate-400">SCENE #${sc.sceneNumber}</span>
+                </div>
+                
+                <div class="p-4 space-y-4">
+                  <p class="text-xs text-purple-200 italic">${sc.logline}</p>
+                  
+                  <!-- Shot List -->
+                  <div class="space-y-3">
+                    ${sc.shots.map(st => `
+                      <div class="bg-surface/60 border border-purple-900/30 rounded-lg p-3 space-y-2 text-xs">
+                        <div class="flex flex-wrap items-center justify-between gap-1 text-[11px] font-mono text-neonCyan">
+                          <span class="font-bold">SHOT ${st.shotId} // ${st.type}</span>
+                          <span class="text-slate-400">Lens: ${st.lens}</span>
+                        </div>
+                        
+                        <p class="text-slate-300"><strong class="text-purple-300">Action:</strong> ${st.visual}</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] pt-1 border-t border-purple-950/60 text-slate-400">
+                          <div><span class="text-purple-400 font-semibold">Camera Move:</span> ${st.movement}</div>
+                          <div><span class="text-purple-400 font-semibold">Dialogue:</span> <span class="italic text-slate-300 font-sans">${st.dialogue}</span></div>
+                        </div>
+
+                        <div class="bg-obsidian/60 p-2 rounded border border-purple-950 text-[11px] text-slate-400 font-mono">
+                          <strong class="text-amber-300">Foley & SFX:</strong> ${st.audioFoley}
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(filmWrapper);
+
+      } else if (state.currentTab === 'prompts') {
+        // AI Prompts Extraction Tab
+        const promptWrapper = document.createElement('div');
+        promptWrapper.className = "space-y-4 animate-fadeIn";
+        promptWrapper.innerHTML = `
+          <div class="border-b border-purple-950 pb-3">
+            <h3 class="font-cinzel text-lg text-white font-bold tracking-wide">AI CINEMATOGRAPHY PROMPTS</h3>
+            <p class="text-xs text-purple-300/60 font-mono">Ready-to-use Midjourney v6, OpenAI Sora & Runway Gen-3 Prompts</p>
+          </div>
+          <div class="space-y-3">
+            ${d.scenes.flatMap(s => s.shots).map((shot, i) => `
+              <div class="bg-obsidian border border-purple-900/40 rounded-xl p-3.5 space-y-2 relative group hover:border-neonCyan/50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-mono uppercase bg-purple-950 text-neonCyan px-2 py-0.5 rounded border border-purple-800/40">
+                    Shot ${shot.shotId} AI Prompt (${shot.type})
+                  </span>
+                  <button onclick="copySnippet('${encodeURIComponent(shot.aiPrompt)}', this)" class="text-xs flex items-center space-x-1 text-slate-400 hover:text-white transition-colors bg-surfaceLight px-2 py-1 rounded border border-purple-900/50">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                    <span>Copy Prompt</span>
+                  </button>
+                </div>
+                <p class="text-xs font-mono text-purple-200/90 leading-relaxed bg-surface/50 p-2.5 rounded-lg border border-purple-950">
+                  ${shot.aiPrompt}
+                </p>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(promptWrapper);
+
+      } else if (state.currentTab === 'audio') {
+        // Sound & Score Scoreboard Tab
+        const audioWrapper = document.createElement('div');
+        audioWrapper.className = "space-y-4 animate-fadeIn";
+        audioWrapper.innerHTML = `
+          <div class="border-b border-purple-950 pb-3">
+            <h3 class="font-cinzel text-lg text-white font-bold tracking-wide">ORIGINAL SOUNDTRACK & FOLEY SUITE</h3>
+            <p class="text-xs text-purple-300/60 font-mono">Music supervisor thematic motifs and sound design blueprint</p>
+          </div>
+          <div class="grid grid-cols-1 gap-3">
+            <div class="bg-obsidian border border-purple-900/40 rounded-xl p-4 space-y-3">
+              <div class="flex items-center space-x-2 text-neonCyan text-xs font-mono font-bold">
+                <i data-lucide="music" class="w-4 h-4"></i>
+                <span>MAIN THEME MOTIF: "THE DYING FREQUENCY"</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">
+                Instrumentation: Distorted analog synthesizers (Moog Sub 37), cello bow scraped across industrial oil drums, sub-bass pulse synced to human resting heart rate (62 BPM). Influences: Hans Zimmer (Blade Runner 2049) & Jóhann Jóhannsson (Arrival).
+              </p>
+              <div class="grid grid-cols-3 gap-2 text-center text-[10px] font-mono pt-2 border-t border-purple-950">
+                <div class="bg-surfaceLight/50 p-2 rounded">KEY: D-Minor</div>
+                <div class="bg-surfaceLight/50 p-2 rounded">TEMPO: 58-68 BPM</div>
+                <div class="bg-surfaceLight/50 p-2 rounded">DYNAMIC: Crescendo to Silence</div>
+              </div>
+            </div>
+
+            ${d.scenes.map(s => `
+              <div class="bg-surface/50 border border-purple-950 rounded-xl p-3 text-xs space-y-1.5">
+                <span class="text-[11px] font-mono text-purple-300 font-semibold">${s.heading}</span>
+                <p class="text-slate-400"><strong>Sound Design Cue:</strong> ${s.shots[0].audioFoley}</p>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(audioWrapper);
+      }
+    }
+
+    // Helper: Copy individual snippet
+    function copySnippet(encodedText, btn) {
+      const text = decodeURIComponent(encodedText);
+      navigator.clipboard.writeText(text).then(() => {
+        const original = btn.innerHTML;
+        btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i><span class="text-emerald-400">Copied</span>`;
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = original;
+          lucide.createIcons();
+        }, 1800);
+      });
+    }
+
+    // Copy entire active tab output
+    function copyCurrentTab() {
+      if (!state.generatedData) {
+        alert("Synthesize a story or film board first.");
+        return;
+      }
+      const container = document.getElementById('renderedOutput');
+      navigator.clipboard.writeText(container.innerText).then(() => {
+        alert("Active studio tab copied to clipboard!");
+      });
+    }
+
+    // Export Document as Markdown file
+    function exportDocument() {
+      if (!state.generatedData) {
+        alert("Please generate content first.");
+        return;
+      }
+      const d = state.generatedData;
+      let content = `# ${d.title}\n\nGenerated via AURA Story & Film Studio\n\n`;
+
+      if (state.mode === 'story') {
+        content += `**Genre:** ${d.genre}\n**Language:** ${d.language}\n**Setting:** ${d.setting}\n**Ending:** ${d.ending}\n\n---\n\n`;
+        d.chapters.forEach(ch => {
+          content += `### ${ch.heading}\n\n${ch.text}\n\n`;
+        });
+      } else {
+        content += `**Director Vision:** ${d.directorStyle}\n**Optics:** ${d.cameraGear}\n**Lighting:** ${d.lightingScheme}\n\n---\n\n`;
+        d.scenes.forEach(sc => {
+          content += `## ${sc.heading}\n${sc.logline}\n\n`;
+          sc.shots.forEach(st => {
+            content += `**Shot ${st.shotId} (${st.type})**\n- Lens: ${st.lens}\n- Visual: ${st.visual}\n- AI Prompt: \`${st.aiPrompt}\`\n\n`;
+          });
+        });
+      }
+
+      const blob = new Blob([content], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${d.title.replace(/\s+/g, '_').toLowerCase()}_aura_studio.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Read Aloud Narration using Web Speech Synthesis
+    function readAloudOutput() {
+      if (!window.speechSynthesis) {
+        alert("Speech synthesis is not supported in this browser.");
+        return;
+      }
+
+      if (window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        return;
+      }
+
+      const container = document.getElementById('renderedOutput');
+      if (!container || !state.generatedData) {
+        alert("No story or script to narrate yet!");
+        return;
+      }
+
+      // Read text of the first chapter or shot
+      let textToRead = "";
+      if (state.mode === 'story') {
+        textToRead = state.generatedData.chapters.map(c => `${c.heading}. ${c.text}`).join(' ');
+      } else {
+        textToRead = `Production title: ${state.generatedData.title}. ` + 
+          state.generatedData.scenes.map(s => `${s.heading}. ${s.shots.map(st => st.visual).join('. ')}`).join('. ');
+      }
+
+      const utterance = new SpeechSynthesisUtterance(textToRead);
+      utterance.rate = 0.95;
+      utterance.pitch = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  </script>
+</body>
+</html>
