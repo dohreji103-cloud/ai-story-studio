@@ -621,57 +621,177 @@
       }
       lucide.createIcons();
     }
-
-    // AI ENGINE SIMULATOR (Dynamic Procedural Generation)
-    function generateOutput() {
+        // REAL GEMINI AI GENERATOR
+    async function generateOutput() {
       const premise = document.getElementById('inputConcept').value.trim();
+
       if (!premise) {
-        alert("Please enter a premise or core story idea first.");
+        alert("Please enter a story idea first.");
         return;
       }
 
+      const startTime = performance.now();
       const idleState = document.getElementById('idleState');
       const loadingState = document.getElementById('loadingState');
       const renderedOutput = document.getElementById('renderedOutput');
       const loadingStep = document.getElementById('loadingStep');
       const latencyStamp = document.getElementById('latencyStamp');
+      const generateBtn = document.getElementById('generateBtn');
 
       idleState.classList.add('hidden');
       renderedOutput.classList.add('hidden');
       loadingState.classList.remove('hidden');
+      generateBtn.disabled = true;
+      loadingStep.innerText = "Connecting to Gemini AI...";
 
-      const steps = [
-        "Analyzing thematic motifs & conflict vectors...",
-        "Calibrating character psyches & dialogue cadences...",
-        "Rendering volumetric lighting, lenses & camera blocking...",
-        "Compiling production cues & generative diffusion prompts..."
-      ];
+      try {
+        const mode = state.mode;
+        const genre = document.getElementById('inputGenre').value;
+        const language = document.getElementById('inputLanguage').value;
 
-      let stepIdx = 0;
-      const stepInterval = setInterval(() => {
-        stepIdx++;
-        if (stepIdx < steps.length) {
-          loadingStep.innerText = steps[stepIdx];
+        let details = {};
+
+        if (mode === 'story') {
+          const rows = document.querySelectorAll('#characterList > div');
+          const characters = [];
+
+          rows.forEach(row => {
+            const inputs = row.querySelectorAll('input');
+            if (inputs.length >= 2 && inputs[0].value.trim()) {
+              characters.push({
+                name: inputs[0].value.trim(),
+                trait: inputs[1].value.trim()
+              });
+            }
+          });
+
+          details = {
+            setting: document.getElementById('inputSetting').value,
+            ending: document.getElementById('inputEnding').value,
+            length: state.selectedLength,
+            characters
+          };
+        } else {
+          details = {
+            directorStyle: document.getElementById('filmDirector').value,
+            cameraGear: document.getElementById('filmCamera').value,
+            lightingScheme: document.getElementById('filmLighting').value,
+            engine: document.getElementById('filmEngine').value,
+            sceneCount: Number(document.getElementById('sceneRange').value)
+          };
         }
-      }, 350);
 
-      const startTime = performance.now();
+        const prompt = `
+You are a professional creative writer and film production assistant.
+Create original, detailed content using the user's inputs.
 
-      // Simulate generation delay
-      setTimeout(() => {
-        clearInterval(stepInterval);
-        const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
-        latencyStamp.innerText = `Synthesized in ${elapsed}s • High Fidelity`;
+MODE: ${mode}
+IDEA: ${premise}
+GENRE: ${genre}
+LANGUAGE: ${language}
+DETAILS: ${JSON.stringify(details)}
 
-        // Build procedural content based on actual user inputs
-        buildEngineResults();
+Return ONLY valid JSON. No markdown fences and no extra explanation.
+
+For STORY mode, use exactly this structure:
+{
+ "title":"Story title",
+ "genre":"Genre",
+ "language":"Language",
+ "setting":"Setting",
+ "ending":"Ending",
+ "length":"Length",
+ "protagonist":{"name":"Name","trait":"Trait"},
+ "antagonist":{"name":"Name","trait":"Trait"},
+ "characters":[{"name":"Name","trait":"Trait"}],
+ "chapters":[{"heading":"Chapter heading","text":"Detailed story text"}],
+ "dialogueExtract":[{"speaker":"Character","line":"Dialogue"}]
+}
+Create a complete, coherent story with multiple substantial chapters and meaningful dialogue.
+
+For FILM mode, use exactly this structure:
+{
+ "title":"Film title",
+ "directorStyle":"Director style",
+ "cameraGear":"Camera",
+ "lightingScheme":"Lighting",
+ "engine":"Platform",
+ "scenes":[
+  {
+   "sceneNumber":1,
+   "heading":"Scene heading",
+   "logline":"Scene summary",
+   "shots":[
+    {
+     "shotId":"1.1",
+     "type":"Shot type",
+     "lens":"Lens",
+     "movement":"Camera movement",
+     "visual":"Detailed visual description",
+     "lighting":"Lighting details",
+     "dialogue":"Dialogue or voice-over",
+     "audioFoley":"Sound and music suggestions",
+     "aiPrompt":"Detailed image/video generation prompt"
+    }
+   ]
+  }
+ ]
+}
+Create the requested number of distinct scenes. Each scene must have three distinct shots. Keep every scene connected to the same story.
+`;
+
+        const response = await fetch(
+          "https://ai-story-studio-api.dohreji103.workers.dev/",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt })
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("AI server error: " + response.status);
+        }
+
+        const result = await response.json();
+
+        if (!result.text) {
+          throw new Error("Gemini returned an empty response.");
+        }
+
+        const cleanText = result.text
+          .replace(/^```json\s*/i, "")
+          .replace(/^```\s*/i, "")
+          .replace(/\s*```$/, "")
+          .trim();
+
+        state.generatedData = JSON.parse(cleanText);
+
+        if (mode === 'story' &&
+            (!state.generatedData.chapters || !state.generatedData.dialogueExtract)) {
+          throw new Error("Story response is incomplete. Please try again.");
+        }
+
+        if (mode === 'film' && !state.generatedData.scenes) {
+          throw new Error("Film response is incomplete. Please try again.");
+        }
 
         loadingState.classList.add('hidden');
         renderedOutput.classList.remove('hidden');
         renderCurrentTabContent();
-      }, 1500);
-    }
 
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(1);
+        latencyStamp.innerText = `Generated by Gemini • ${elapsed}s`;
+
+      } catch (error) {
+        console.error(error);
+        loadingState.classList.add('hidden');
+        idleState.classList.remove('hidden');
+        alert("Generation failed: " + error.message);
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
     // Procedural Generator Core
     function buildEngineResults() {
       const premise = document.getElementById('inputConcept').value;
